@@ -34,6 +34,15 @@ OS name: "linux", version: "7.2.11-arch1-1", arch: "amd64", family: "unix"
 
 **Анхааруулга:** Өгөгдсөн эх кодыг өөрчлөөгүй. DU анализад ашиглах мөрийн дугаарыг хэвээр хадгалсан.
 
+## 2.1 Bonus функцийн Control Flow Graph
+
+Bonus функцийн Control Flow Graph-ийг Graphviz ашиглан үүсгэсэн.
+
+- Эх файл: `results/cfg-bonus.dot`
+- Зураг: `results/cfg-bonus.png`
+
+![Bonus Control Flow Graph](results/cfg-bonus.png)
+
 ## 3. B2 — Definition / Use анализ
 
 ### 3.1 Нэр томьёо
