@@ -1,38 +1,39 @@
 # Лаборатори №10 — Өгөгдлийн урсгалын тест (Definition-Use Pairs)
 
 **Төслийн хэл:** Java 17  
-**Build tool:** Maven
+**Build tool:** Maven  
+**Үйлдлийн систем:** Arch Linux
 
-Ашигласан Java хувилбарыг `java -version` командаар шалгасан.
+Ашигласан Java хувилбар:
 
 ```text
-[heloise@arch lab08]$ java -version
 openjdk version "17.0.21.0.3" 2026-10-24
-OpenJDK Runtime Environment (build 17.0.21.0.3+1)
-OpenJDK 64-Bit Server VM (build 17.0.21.0.3+1, mixed mode, sharing)
 ```
 
-Ашигласан Maven болон Java орчны мэдээллийг `mvn -version` командаар шалгасан.
+Ашигласан Maven хувилбар:
 
 ```text
-[heloise@arch lab08]$ mvn -version
-Apache Maven 3.10.0 (c43a36b8d67be7e0805a411bc0898af1a51f5472)
-Maven home: /usr/share/java/maven
-Java version: 17.0.21.0.3, vendor: Arch Linux, runtime: /usr/lib/jvm/java-17-openjdk
-Default locale: en_US, platform encoding: UTF-8, time zone: Asia/Ulaanbaatar
-OS name: "linux", version: "7.2.11-arch1-1", arch: "amd64", family: "unix"
+Apache Maven 3.10.0
+Java version: 17.0.21.0.3
+OS: Arch Linux
 ```
+
 ## 1. Лабораторийн зорилго
 
-Энэ лабораторийн ажлаар өгөгдсөн `DataFlowTargets` классын `gcd()` болон `bonus()` функцүүдэд өгөгдлийн урсгалын анализ хийж, хувьсагч бүрийн Definition (Def), Computational Use (C-use), Predicate Use (P-use), Kill болон Definition-Use (DU) хосуудыг тодорхойлно.
+Энэ лабораторийн ажлаар өгөгдсөн `DataFlowTargets` классын `gcd()` болон `bonus()` функцүүдэд өгөгдлийн урсгалын анализ хийж, хувьсагч бүрийн Definition (Def), Computational Use (C-use), Predicate Use (P-use), Kill болон Definition-Use (DU) хосуудыг тодорхойлсон.
 
-Мөн All-Defs болон All-DU-Pairs хамралтыг шалгах тестүүдийг боловсруулна.
+Мөн дараах тестийн аргуудыг хэрэгжүүлсэн:
+
+- All-Defs testing
+- All-DU-Pairs testing
+- Mutation testing
+- JaCoCo coverage analysis
 
 ## 2. Эх код
 
 `src/main/java/mn/edu/must/sqat/DataFlowTargets.java`
 
-**Анхааруулга:** Өгөгдсөн эх кодыг өөрчлөөгүй. DU анализад ашиглах мөрийн дугаарыг хэвээр хадгалсан.
+**Анхааруулга:** Өгөгдсөн эх кодын мөрийн дугаарыг DU анализад ашигласан. Mutation testing хийх үед түр өөрчлөлт оруулсан боловч туршилт бүрийн дараа эх кодыг сэргээсэн.
 
 ## 2.1 Bonus функцийн Control Flow Graph
 
@@ -182,7 +183,9 @@ DU хос нь тухайн definition-ээс use хүртэлх замд ижи
 
 32-р мөрөнд:
 
-`attendance == null || threshold < 0`
+```java
+attendance == null || threshold < 0
+```
 
 гэсэн логик OR ашигласан. Java хэлэнд эхний нөхцөл үнэн байвал хоёр дахь нөхцөлийг шалгахгүй. Иймээс `attendance == null` үед `threshold < 0` илэрхийлэл үнэлэгдэхгүй.
 
@@ -194,19 +197,12 @@ DU хос нь тухайн definition-ээс use хүртэлх замд ижи
 
 | Тест | Оролт | Хүлээгдэж буй үр дүн | Зорилго |
 |---|---|---:|---|
-| B-AD1 | attendance = {1,1,0,1,1,1,1,1}, threshold = 7 | 8 | present, streak, best болон score-ийн эерэг definition-үүдийг хамруулах |
-| B-AD2 | attendance = {}, threshold = 1 | 0 | present=0, best=0, score=0 definition-үүдийг хамруулах |
+| B-AD1 | attendance = `{1,1,0,1,1,1,1,1}`, threshold = 7 | 8 | present, streak, best болон score-ийн эерэг definition-үүдийг хамруулах |
+| B-AD2 | attendance = `{}`, threshold = 1 | 0 | present=0, best=0, score=0 definition-үүдийг хамруулах |
 
-### 7.1 Туршилтын үр дүн
+### 7.1 All-Defs туршилтын үр дүн
 
-`mvn clean verify` командыг ажиллуулсан.
-
-- Tests run: 4
-- Failures: 0
-- Errors: 0
-- BUILD SUCCESS
-
-JaCoCo All-Defs үр дүн:
+`mvn clean verify` командаар All-Defs тестүүдийг шалгасан.
 
 | Үзүүлэлт | Covered | Missed | Нийт |
 |---|---:|---:|---:|
@@ -219,22 +215,156 @@ Branch coverage: 14 / 16 = 87.5%.
 
 All-Defs болон Branch Coverage нь өөр өөр хамралтын шалгуур тул All-Defs тест амжилттай болсон ч бүх branch хамрагдах албагүй.
 
-## 8. Үр дүнгийн файлууд
+## 8. All-DU-Pairs тестүүд
 
-- `results/jacoco-alldefs.csv`
-- `results/mvn-verify-alldefs.txt`
+Тестийн файл:
 
-## 9. Дараагийн хийх ажлууд
+`src/test/java/mn/edu/must/sqat/BonusAllDUPairsTest.java`
 
-- [ ] Bonus функцийн Control Flow Graph (`cfg-bonus.png`)
-- [ ] All-DU-Pairs тестүүд
-- [ ] Mutation testing (M1, M2, M3)
-- [ ] Final JaCoCo coverage
-- [ ] Final Maven test result
-- [ ] Эцсийн Git commit болон push
+All-DU-Pairs тестүүдээр хувьсагчдын definition-ээс use хүртэлх замуудыг шалгасан.
 
-## 10. Дүгнэлт
+| Тест | Шалгах нөхцөл | Хүлээгдэж буй үр дүн |
+|---|---|---:|
+| DU1 | Null attendance | IllegalArgumentException |
+| DU2 | Negative threshold | IllegalArgumentException |
+| DU3 | Empty attendance, threshold 0 | 5 |
+| DU4 | Empty attendance, threshold 1 | 0 |
+| DU5 | One positive attendance | 5 |
+| DU6 | Streak reset and shorter new streak | 0 |
+| DU7 | Five scattered positive days | 5 |
+| DU8 | Five consecutive days below threshold | 3 |
 
-Энэ лабораторийн ажлаар `bonus()` функцийн хувьсагч бүрийн Definition болон Use цэгүүдийг тодорхойлж, def-clear замын дагуу DU хосуудыг гаргасан. Мөн All-Defs тестүүдийг ажиллуулж, Maven болон JaCoCo ашиглан тестийн үр дүн, хамралтыг шалгасан.
+### 8.1 All-DU-Pairs туршилтын үр дүн
 
-All-Defs тестүүд амжилттай ажилласан боловч Branch Coverage 87.5% байгаа тул үлдсэн branch-уудыг дараагийн тестүүдээр хамруулах шаардлагатай.
+| Үзүүлэлт | Covered | Missed | Нийт |
+|---|---:|---:|---:|
+| Instructions | 78 | 3 | 81 |
+| Branches | 16 | 0 | 16 |
+| Lines | 23 | 1 | 24 |
+| Methods | 2 | 1 | 3 |
+
+- Branch coverage: 16 / 16 = 100%.
+- Line coverage: 23 / 24 = 95.8%.
+- Instruction coverage: 78 / 81 = 96.3%.
+
+JaCoCo-ийн Branch Coverage 100% болсон нь бүх DU pair хамрагдсан гэсэн шууд баталгаа биш. Эдгээр нь тусдаа хэмжүүрүүд юм.
+
+## 9. Mutation Testing
+
+Mutation testing нь програмын кодод зориудаар жижиг өөрчлөлт оруулж, тестүүд тухайн алдааг илрүүлж чадаж байгаа эсэхийг шалгах арга юм.
+
+Энэ лабораторид гурван mutation туршилт хийсэн.
+
+### 9.1 M1 — Missing Update
+
+**Өөрчлөлт:** `streak = streak + 1;` мөрийг устгасан.
+
+Үр дүнд нь дараалсан ирцийн тоо нэмэгдэхээ больсон.
+
+| Унасан тест | Expected | Actual |
+|---|---:|---:|
+| `BonusAllDUPairsTest.fiveConsecutiveBelowThreshold` | 3 | 0 |
+| `BonusAllDefsTest.bonusAllDefsCoversEveryDefinition` | 8 | 5 |
+
+**Үр дүн:** Mutation тестүүдээр илэрсэн.
+
+### 9.2 M2 — Wrong Variable
+
+**Өөрчлөлт:** `best = streak;` мөрийг `best = present;` болгож сольсон.
+
+Эхний 12 тест mutation-ийг илрүүлээгүй тул тусгай тест нэмсэн.
+
+Тестийн файл:
+
+`src/test/java/mn/edu/must/sqat/BonusM2MutationTest.java`
+
+Тестийн оролт:
+
+```java
+int[] attendance = {1, 1, 1, 0, 1, 1, 1, 1};
+```
+
+`threshold = 7` үед нийт ирц 7 боловч хамгийн урт дараалсан ирц 4 байна.
+
+| Үзүүлэлт | Утга |
+|---|---:|
+| Expected | 5 |
+| Actual | 8 |
+| Унасан тест | `BonusM2MutationTest.totalAttendanceMustNotReplaceBestStreak` |
+
+**Үр дүн:** Нэмэлт тестээр mutation илэрсэн.
+
+### 9.3 M3 — Dead Definition
+
+**Өөрчлөлт:** Давталтын дараа дараах ашиглагдахгүй хувьсагчийг нэмсэн.
+
+```java
+int total = present + best;
+```
+
+`total` хувьсагчид утга оноосон боловч програмын цаашдын ажиллагаанд ашиглаагүй.
+
+| Үзүүлэлт | Үр дүн |
+|---|---|
+| Tests run | 13 |
+| Failures | 0 |
+| Errors | 0 |
+| Build | BUILD SUCCESS |
+
+**Дүгнэлт:** Одоогийн тестүүд ашиглагдахгүй definition-ийг илрүүлээгүй. Энэ mutation нь тестээр илрэхгүй үлдсэн.
+
+### 9.4 Mutation Testing-ийн нэгтгэл
+
+| Mutation | Өөрчлөлт | Үр дүн |
+|---|---|---|
+| M1 | streak update мөрийг устгасан | 2 тестээр илэрсэн |
+| M2 | best = streak → best = present | Нэмэлт тестээр илэрсэн |
+| M3 | Ашиглагдахгүй total хувьсагч нэмсэн | Тестүүд илрүүлээгүй |
+
+Mutation туршилт бүрийн дараа `DataFlowTargets.java` эх кодыг `git restore` командаар сэргээсэн.
+
+## 10. Эцсийн туршилтын үр дүн
+
+Эцсийн шалгалтыг дараах командаар ажиллуулсан:
+
+```bash
+mvn clean verify
+```
+
+Үр дүн:
+
+```text
+Tests run: 13
+Failures: 0
+Errors: 0
+Skipped: 0
+
+BUILD SUCCESS
+```
+
+Эцсийн шалгалтаар All-Defs, All-DU-Pairs, GCD болон M2 mutation-ийг илрүүлэх нэмэлт тестүүд бүгд амжилттай ажилласан.
+
+## 11. Үр дүнгийн файлууд
+
+| Файл | Тайлбар |
+|---|---|
+| `results/cfg-bonus.dot` | Control Flow Graph эх файл |
+| `results/cfg-bonus.png` | Control Flow Graph зураг |
+| `results/jacoco-alldefs.csv` | All-Defs coverage |
+| `results/mvn-verify-alldefs.txt` | All-Defs Maven үр дүн |
+| `results/jacoco-alldupairs.csv` | All-DU-Pairs coverage |
+| `results/mvn-verify-alldupairs.txt` | All-DU-Pairs Maven үр дүн |
+| `results/mvn-test-M1.txt` | M1 mutation үр дүн |
+| `results/mvn-test-M2.txt` | M2 эхний туршилтын үр дүн |
+| `results/mvn-test-M2-kill.txt` | M2 нэмэлт тестээр илэрсэн үр дүн |
+| `results/mvn-test-M3.txt` | M3 mutation үр дүн |
+| `results/mvn-verify-final.txt` | Эцсийн Maven шалгалт |
+| `results/jacoco-final.csv` | Эцсийн JaCoCo coverage |
+
+## 12. Дүгнэлт
+
+Энэ лабораторийн ажлаар `gcd()` болон `bonus()` функцүүдийн өгөгдлийн урсгалын анализ хийж, хувьсагчдын Definition, Use, Kill болон DU хосуудыг тодорхойлсон.
+
+All-Defs болон All-DU-Pairs тестүүдийг боловсруулж, JaCoCo ашиглан кодын хамралтыг шалгасан. Мөн Mutation Testing ашиглан тестийн чанарыг шалгахад M1 болон M2 алдааг илрүүлж чадсан бол M3 dead definition тестээр илрээгүй.
+
+Эцсийн `mvn clean verify` шалгалтаар 13 тест бүгд амжилттай ажиллаж, `BUILD SUCCESS` үр дүн гарсан.
