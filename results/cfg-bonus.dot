@@ -28,29 +28,41 @@ digraph bonus {
 
     start -> n31;
     n31 -> n32;
-    n32 -> n33 [label="true"];
-    n32 -> n35 [label="false"];
+
+    n32 -> n33 [label="T: nullAttendance()\nnegativeThreshold()"];
+    n32 -> n35 [label="F: emptyAttendanceThresholdZero()\nemptyAttendanceThresholdOne()"];
     n33 -> end;
+
     n35 -> n36;
     n36 -> n37;
     n37 -> n38;
-    n38 -> n39 [label="next element"];
-    n38 -> n49 [label="no next element"];
-    n39 -> n40 [label="true"];
-    n39 -> n45 [label="false"];
+
+    n38 -> n39 [label="next: onePositiveAttendance()\nstreakReset()\nscatteredAttendance()\nfiveConsecutiveBelowThreshold()"];
+    n38 -> n49 [label="exit: emptyAttendanceThresholdZero()\nemptyAttendanceThresholdOne()"];
+
+    n39 -> n40 [label="T: onePositiveAttendance()\nstreakReset()\nscatteredAttendance()\nfiveConsecutiveBelowThreshold()"];
+    n39 -> n45 [label="F: streakReset()\nscatteredAttendance()"];
+
     n40 -> n41;
     n41 -> n42;
-    n42 -> n43 [label="true"];
-    n42 -> n38 [label="false"];
+
+    n42 -> n43 [label="T: onePositiveAttendance()\nfiveConsecutiveBelowThreshold()"];
+    n42 -> n38 [label="F: streakReset()"];
+
     n43 -> n38;
     n45 -> n46;
     n46 -> n38;
+
     n49 -> n50;
-    n50 -> n51 [label="true"];
-    n50 -> n53 [label="false"];
+
+    n50 -> n51 [label="T: bonusAllDefsCoversEveryDefinition()\nemptyAttendanceThresholdZero()\nonePositiveAttendance()"];
+    n50 -> n53 [label="F: scoreZeroDefinitionReachesReturn()\nfiveConsecutiveBelowThreshold()"];
+
     n51 -> n53;
-    n53 -> n54 [label="true"];
-    n53 -> n56 [label="false"];
+
+    n53 -> n54 [label="T: bonusAllDefsCoversEveryDefinition()\nfiveConsecutiveBelowThreshold()"];
+    n53 -> n56 [label="F: emptyAttendanceThresholdOne()\nonePositiveAttendance()"];
+
     n54 -> n56;
     n56 -> end;
 }
